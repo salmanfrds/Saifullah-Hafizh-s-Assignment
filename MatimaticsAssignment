@@ -1,0 +1,295 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
+ */
+
+import java.util.Scanner;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class MatimaticsAssignment {
+    
+    public static void main(String[] args) {   
+        //menu
+        Scanner input = new Scanner(System.in);
+        System.out.println("Please select 1 or 2 degree");
+        int b = input.nextInt();
+        
+            if(b==1){
+                oneDegree();
+            } else if (b==2){
+                twoDegree();
+            } else {
+                System.out.println("invalid");
+            }
+    }
+    
+    //one degree
+    public static void oneDegree(){
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("Please enter a0");
+        double a0 = input.nextDouble();
+        System.out.println("Please enter c");
+        double c = input.nextDouble();
+        boolean increasing = true;
+        boolean decreasing = true;
+        boolean constant = true;
+        boolean upDown = false; // Initialize as false
+        boolean diverging = false; // Initialize as false
+        boolean converging = false; // Initialize as false
+        double prevValue = a0;
+        // repeat 50 times
+        for (int i = 2; i < 52; i++) {
+            double result = calculateSequence(a0, c, i);
+            System.out.println(String.format("%.2f",result));
+        
+            //difine up down
+            if (result > prevValue) {
+                decreasing = false;
+                constant = false;
+                if (!increasing) {
+                    upDown = true; // Set upDown flag to true if values go both up and down
+                }
+            // define up down
+            } else if (result < prevValue) {
+                increasing = false;
+                constant = false;
+                if (!decreasing) {
+                    upDown = true; // Set upDown flag to true if values go both up and down
+                }
+            } else {
+                increasing = false;
+                decreasing = false;
+            }
+            double beginning = 0;
+            double end=0;
+            // define diverging and converging
+            if(i==4){
+                 beginning = result;
+            } else if (i==50){
+                 end = result;
+            }
+            
+            //determine diverging or converging if increasing
+            if (increasing){
+                if (end >beginning) { 
+                    diverging = true;
+                    converging = false;
+                } else if (end < beginning) {
+                    converging = true;
+                    diverging = false;
+                }
+            
+            //determine diverging or converging if decreasing
+            } else if (decreasing){
+                if (end <beginning) { 
+                    diverging = true;
+                    converging = false;
+                } else if (end > beginning) {
+                    converging = true;
+                    diverging = false;
+                }
+
+            //determine diverging or converging if updown
+            } else if (upDown){
+                if (i == 6){
+                    beginning = result;
+                } else if (i == 48){
+                    end = result;
+                }
+                if (beginning > 0){
+                    if(end < beginning){
+                        diverging = true;
+                        converging = false;
+                    } else {
+                        converging = true;
+                        diverging = false;
+                    }
+                } else if ( beginning > 0){
+                    if(end > beginning){
+                        diverging = true;
+                        converging = false;
+                    } else {
+                        converging = true;
+                        diverging = false;
+                    }
+                }
+                prevValue = result;
+            }
+        }
+
+        // print the result 
+        System.out.println("");
+        
+        System.out.println("Increasing\t: " + (increasing ? "yes" : "no"));
+        System.out.println("Decreasing\t: " + (decreasing ? "yes" : "no"));
+        System.out.println("Constant\t: " + (constant ? "yes" : "no"));
+        System.out.println("Up-down\t\t: " + (upDown ? "yes" : "no"));
+        System.out.println("Diverging\t: " + (diverging ? "yes" : "no"));
+        System.out.println("Converging\t: " + (converging ? "yes" : "no"));
+        
+        try {
+            FileWriter fileWriter = new FileWriter("sequence.txt");
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+            for (int i = 1; i <= 10; i++) {
+                double result = calculateSequence(a0, c, i);
+                bufferedWriter.write(String.valueOf(result));
+                bufferedWriter.newLine();
+
+                // Check sequence properties
+                if (result > prevValue) {
+                    decreasing = false;
+                    constant = false;
+                    if (!increasing) {
+                        upDown = true; // Set upDown flag to true if values go both up and down
+                    }
+                } else if (result < prevValue) {
+                    increasing = false;
+                    constant = false;
+                    if (!decreasing) {
+                        upDown = true; // Set upDown flag to true if values go both up and down
+                    }
+                } else {
+                    increasing = false;
+                    decreasing = false;
+                }
+            
+                if (result > a0) { 
+                    diverging = true;
+                } else if (result < a0) {
+                    converging = true; 
+                }
+                prevValue = result;
+            }
+            
+            // Close the BufferedWriter after writing
+            bufferedWriter.close();
+            System.out.println("Sequence written to 'sequence.txt' file.");
+        }catch (IOException e){
+            System.out.println("An error occurred while writing the file.");
+            e.printStackTrace();
+        }
+    }
+        
+    public static void twoDegree(){
+        Scanner input1 = new Scanner(System.in);
+        System.out.println("Please enter nummber as A");
+        double A =input1.nextDouble();
+        System.out.println("Please enter nummber as B");
+        double B = input1.nextDouble();
+        System.out.println("Please enter number as C1");
+        double c1 = input1.nextDouble();
+        System.out.println("Please enter number as C2");
+        double c2 = input1.nextDouble();
+        
+        double d= Math.sqrt(Math.pow(c1, 2) + 4*c2);
+        double r1 = rOne(c1, d);
+        double r2 = rTwo(c1,d);
+        
+        boolean increasing = true;
+        boolean decreasing = true;
+        boolean constant = true;
+        boolean upDown = false; // Initialize as false
+        boolean diverging = false; // Initialize as false
+        boolean converging = false; // Initialize as false
+        double prevValue = A*Math.pow(r1, 2)+B*Math.pow(r2, 2); // Initialize prevValue with the first value of the sequence
+        double awal = 0;
+        double akhir=0;
+        
+        //repeat 50 times
+        for (int i=3; i<53; i++){ // Start from 3 because we already have the first value
+            double result= A*Math.pow(r1, i)+B*Math.pow(r2, i);
+            System.out.println(result);
+            if (i==4){
+                awal = result;
+            }
+            else if (i==50){
+                akhir = result;
+            }
+        // difine updown
+            if (result > prevValue) {
+                decreasing = false;
+                constant = false;
+                if (!increasing) {
+                    upDown = true; // Set upDown flag to true if values go both up and down
+                }
+
+            } else if (result < prevValue) {
+                increasing = false;
+                constant = false;
+                if (!decreasing) {
+                    upDown = true; // Set upDown flag to true if values go both up and down
+                }
+
+            } else {
+                increasing = false;
+                decreasing = false;
+            }
+
+            // digine diverging and converging if increasing
+            if (increasing){
+                if (akhir >awal) { 
+                    diverging = true;
+                    converging = false;
+                } else if (akhir < awal) {
+                    converging = true;
+                    diverging = false;
+                }
+            
+            // digine diverging and converging if decreasing
+            } else if (decreasing){
+                if (akhir <awal) { 
+                    diverging = true;
+                    converging = false;
+                } else if (akhir > awal) {
+                    converging = true;
+                    diverging = false;
+                }
+            
+            // digine diverging and converging if updown
+            } else if (upDown){
+                if (akhir != awal) {
+                    diverging = true;
+                    converging = false;
+                } else {
+                    converging = true;
+                    diverging = false;
+                }
+            }
+            prevValue = result;
+        }
+
+        // Print the results
+        System.out.println("Increasing\t: " + (increasing ? "yes" : "no"));
+        System.out.println("Decreasing\t: " + (decreasing ? "yes" : "no"));
+        System.out.println("Constant\t: " + (constant ? "yes" : "no"));
+        System.out.println("Up-down\t\t: " + (upDown ? "yes" : "no"));
+        System.out.println("Diverging\t: " + (diverging ? "yes" : "no"));
+        System.out.println("Converging\t: " + (converging ? "yes" : "no"));
+    
+    }
+    
+    //simplify one degree
+    public static double calculateSequence(double a, double c, int i){
+        double aOne= c*a;
+        double formula = Math.pow(c, i-1)*aOne;
+        return formula;
+    }
+    
+    //root 1 for two degree
+    public static double rOne(double c1, double d) {
+        double r1;
+        r1 =(c1+d)/2;
+        return r1;
+    }
+    
+    // root 2 for two degree
+    public static double rTwo(double c1, double d ) {
+        double r2;
+        r2 =(c1-d)/2;
+        return r2;
+    }
+}
